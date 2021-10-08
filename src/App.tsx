@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { Layout } from "antd";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import LayoutHeader from "./components/layout/header";
+import LayoutContent from "./components/layout/content";
+import ListPost from "./features/posts/components/list-post";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+export const client = new ApolloClient({
+    uri: "https://graphqlzero.almansi.me/api",
+    cache: new InMemoryCache(),
+});
+
+const App: React.FC = () => {
+    return (
+        <div className="App">
+            <ApolloProvider client={client}>
+                <Router>
+                    <Layout>
+                        <LayoutHeader />
+                        <LayoutContent>
+                            <Switch>
+                                <Route exact path="/">
+                                    <Redirect to="/post" />
+                                </Route>
+                                <Route exact path="/user">
+                                    <h1>User</h1>
+                                </Route>
+                                <Route exact path={["/post", "/post/:id"]}>
+                                    <ListPost />
+                                </Route>
+                                <Route exact path="/post/create-post">
+                                    <h1>create</h1>
+                                </Route>
+                            </Switch>
+                        </LayoutContent>
+                    </Layout>
+                </Router>
+            </ApolloProvider>
+        </div>
+    );
+};
 
 export default App;
