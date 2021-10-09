@@ -29,11 +29,8 @@ const App: React.FC = () => {
                                     <Route exact path="/user">
                                         <h1>User</h1>
                                     </Route>
-                                    <Route exact path={["/post", "/post/:id"]}>
+                                    <Route exact path={["/post", "/post/:id", "/post/update/:id"]}>
                                         <ListPost />
-                                    </Route>
-                                    <Route exact path="/post/create-post">
-                                        <h1>create</h1>
                                     </Route>
                                 </Switch>
                             </LayoutContent>

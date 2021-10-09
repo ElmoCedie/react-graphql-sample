@@ -1,4 +1,4 @@
-import { gql, OperationVariables, QueryResult, useQuery } from "@apollo/client";
+import { gql, OperationVariables, QueryResult, useLazyQuery, useQuery } from "@apollo/client";
 import { PostData } from "../../../../entities";
 
 const QUERY = gql`
@@ -14,7 +14,7 @@ const QUERY = gql`
     }
 `;
 
-const getPost = (id: string): QueryResult<PostData, OperationVariables> => {
+export const getPost = (id: string): QueryResult<PostData, OperationVariables> => {
     return useQuery<PostData>(QUERY, {
         fetchPolicy: "no-cache",
         variables: {
@@ -23,4 +23,11 @@ const getPost = (id: string): QueryResult<PostData, OperationVariables> => {
     });
 };
 
-export default getPost;
+export const lazyGetPost = (id?: string) => {
+    return useLazyQuery(QUERY, {
+        fetchPolicy: "no-cache",
+        variables: {
+            id: id ?? "",
+        },
+    });
+};

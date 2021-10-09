@@ -1,6 +1,6 @@
-import React from "react";
-import getPost from "../graphql/queries/get-post";
-import { Spin, Typography } from "antd";
+import React, { useContext, useEffect } from "react";
+import { Typography } from "antd";
+import appContext from "../../../contenxt/app-context";
 
 const { Title, Paragraph } = Typography;
 
@@ -8,18 +8,26 @@ interface Props {
     id: string;
 }
 
-const ViewPost: React.FC<Props> = ({ id }) => {
-    const { loading, data } = getPost(id);
+const ViewPost: React.FC<Props> = () => {
+    const {
+        state: { post },
+        dispatch,
+    } = useContext(appContext);
 
-    return loading ? (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-            <Spin size="large" style={{ marginTop: 15 }} />
-        </div>
-    ) : (
+    useEffect(() => {
+        return () => {
+            dispatch({
+                type: "GET_POST",
+                payload: null,
+            });
+        };
+    }, []);
+
+    return (
         <Typography>
-            <Title level={4}>{data?.post.title}</Title>
-            <Title level={5}>{`Created By ${data?.post.user.username}`}</Title>
-            <Paragraph>{data?.post.body}</Paragraph>
+            <Title level={4}>{post?.title}</Title>
+            <Title level={5}>{`Created By ${post?.user.username}`}</Title>
+            <Paragraph>{post?.body}</Paragraph>
         </Typography>
     );
 };

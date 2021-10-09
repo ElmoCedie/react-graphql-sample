@@ -37,6 +37,7 @@ const CardItem: React.FC<Props> = ({ title, body, onClick }): JSX.Element => {
                     options={[
                         { value: "view", label: "view" },
                         { value: "edit", label: "edit" },
+                        { value: "delete", label: "delete" },
                     ]}
                     onChange={renderMenu}
                 >
