@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import getListPost from "../graphql/queries/get-list-posts";
 import { Input, Modal, Pagination, Spin } from "antd";
 import CardItem from "./card-item";
 import { useHistory, useParams } from "react-router-dom";
 import { PostItem } from "../../../entities";
 import ViewPost from "./view-post";
+import appContext from "../../../contenxt/app-context";
 
 const { Search } = Input;
 
@@ -13,14 +14,17 @@ interface Props {
 }
 
 const ListPost: React.FC = () => {
+    const {
+        state: { posts },
+        dispatch,
+    } = useContext(appContext);
     const params = useParams<Props>();
     const history = useHistory();
-    const [list, setList] = useState<PostItem[]>([]);
     const [totalItem, setTotalItem] = useState(0);
     const [pagination, setPagination] = useState(1);
     const [modalVisible, setModalVisible] = useState(false);
     const [search, setSearch] = useState("");
-    const { loading, data, refetch } = getListPost({
+    const { loading, data, refetch, error } = getListPost({
         search: search,
         pagination: pagination,
     });
@@ -33,10 +37,17 @@ const ListPost: React.FC = () => {
 
     useEffect(() => {
         if (data != undefined) {
-            setList(data.posts.data);
+            // store in state management
+            dispatch({
+                type: "STORE_POST",
+                payload: data.posts.data,
+            });
             setTotalItem(data.posts.meta.totalCount);
         }
-    }, [data]);
+        if (error != undefined) {
+            console.log(error);
+        }
+    }, [data, error]);
 
     const handleOnSearch = (value: string) => {
         setPagination(1);
@@ -76,7 +87,7 @@ const ListPost: React.FC = () => {
                             justifyContent: "center",
                         }}
                     >
-                        {list.map((item: PostItem, index: number) => (
+                        {posts.map((item: PostItem, index: number) => (
                             <CardItem
                                 key={index}
                                 title={item.title}

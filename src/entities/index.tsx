@@ -1,3 +1,5 @@
+import { Dispatch } from "react";
+
 export interface Posts {
     posts: {
         meta: {
@@ -42,4 +44,14 @@ export interface Company {
     name: string;
     bs?: string;
     catchPhrase: string;
+}
+
+export interface ContextState {
+    state: { posts: PostItem[]; users: User[]; message: string };
+    dispatch: Dispatch<ContextAction>;
+}
+
+export interface ContextAction {
+    type: string;
+    payload: any;
 }
