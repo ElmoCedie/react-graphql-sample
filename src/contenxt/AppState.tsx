@@ -6,6 +6,8 @@ const AppState = (props: { children: React.ReactChild }) => {
     const [state, dispatch] = useReducer(mainReducer, {
         posts: [],
         users: [],
+        post: null,
+        user: null,
         message: "sample message",
     });
 

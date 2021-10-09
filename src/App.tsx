@@ -7,6 +7,7 @@ import LayoutHeader from "./components/layout/header";
 import LayoutContent from "./components/layout/content";
 import ListPost from "./features/posts/components/list-post";
 import AppState from "./contenxt/AppState";
+import ListUsers from "./features/users/components/list-users";
 
 export const client = new ApolloClient({
     uri: "https://graphqlzero.almansi.me/api",
@@ -26,8 +27,8 @@ const App: React.FC = () => {
                                     <Route exact path="/">
                                         <Redirect to="/post" />
                                     </Route>
-                                    <Route exact path="/user">
-                                        <h1>User</h1>
+                                    <Route exact path={["/user", "/user/:id", "/user/update/:id"]}>
+                                        <ListUsers />
                                     </Route>
                                     <Route exact path={["/post", "/post/:id", "/post/update/:id"]}>
                                         <ListPost />

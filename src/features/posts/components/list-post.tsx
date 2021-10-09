@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import getListPost from "../graphql/queries/get-list-posts";
-import { Button, Drawer, Input, message, Modal, Pagination, Spin } from "antd";
+import { Drawer, Input, message, Modal, Pagination, Spin } from "antd";
 import CardItem from "./card-item";
 import { useHistory, useParams } from "react-router-dom";
 import { PostItem } from "../../../entities";
@@ -9,6 +9,8 @@ import appContext from "../../../contenxt/app-context";
 import FormPost from "./form-post";
 import deletePost from "../graphql/mutations/delete-post";
 import { lazyGetPost } from "../graphql/queries/get-post";
+import AddButton from "../../../components/button/addButton";
+import { PlusOutlined } from "@ant-design/icons";
 
 const { Search } = Input;
 
@@ -122,7 +124,9 @@ const ListPost: React.FC = () => {
                     size="large"
                     onSearch={handleOnSearch}
                 />
-                <Button onClick={() => setSliderVisible(true)}>Create Post</Button>
+                <AddButton icon={<PlusOutlined />} onClick={() => setSliderVisible(true)}>
+                    ADD POST
+                </AddButton>
             </div>
 
             <div style={{ height: 500 }}>
@@ -148,7 +152,13 @@ const ListPost: React.FC = () => {
                 )}
             </div>
 
-            <Pagination current={pagination} total={totalItem} onChange={handlePagination} />
+            <Pagination
+                current={pagination}
+                total={totalItem}
+                onChange={handlePagination}
+                hideOnSinglePage
+                showSizeChanger={false}
+            />
 
             <Modal
                 visible={modalVisible}

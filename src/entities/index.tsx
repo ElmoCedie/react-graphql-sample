@@ -37,7 +37,7 @@ export interface User {
     address?: string;
     phone?: string;
     website?: string;
-    company?: string;
+    company?: Company;
 }
 
 export interface Company {
@@ -52,6 +52,7 @@ export interface ContextState {
         users: User[];
         message: string;
         post: PostItem | null;
+        user: User | null;
     };
     dispatch: Dispatch<ContextAction>;
 }
