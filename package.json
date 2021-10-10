@@ -37,7 +37,7 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "server": "json-graphql-server db.js --p 3001",
-        "prettier-watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}"
+        "prettier-watch": "npx onchange \"**/*\" -- npx prettier --write --ignore-unknown {{changed}}"
     },
     "eslintConfig": {
         "extends": [
