@@ -4,7 +4,8 @@ import { FormItem, Input } from "formik-antd";
 import React, { useContext, useEffect } from "react";
 import * as yup from "yup";
 import appContext from "../../../context/app-context";
-import { v4 as uuidv4 } from "uuid";
+import updatePost from "../graphql/mutations/update-post";
+import createPost from "../graphql/mutations/create-post";
 
 interface Props {
     onClose: () => void;
@@ -15,39 +16,19 @@ const FormPost: React.FC<Props> = ({ onClose }) => {
         state: { post },
         dispatch,
     } = useContext(appContext);
+    const [_createPost, { loading: createLoading }] = createPost();
+    const [_updatePost, { loading: updateLoading }] = updatePost();
 
     useEffect(() => {
         return () => {
-            dispatch({
-                type: "GET_POST",
-                payload: null,
-            });
+            if (post != null) {
+                dispatch({
+                    type: "GET_POST",
+                    payload: null,
+                });
+            }
         };
     }, []);
-
-    const handleAddPost = (value: any) => {
-        dispatch({
-            type: "ADD_POST",
-            payload: {
-                id: uuidv4(),
-                ...value,
-                user: {
-                    username: "new.user",
-                },
-            },
-        });
-    };
-
-    const handleUpdatePost = (value: any) => {
-        dispatch({
-            type: "UPDATE_POST",
-            payload: {
-                ...post,
-                ...value,
-                id: post?.id,
-            },
-        });
-    };
 
     return (
         <div>
@@ -55,27 +36,50 @@ const FormPost: React.FC<Props> = ({ onClose }) => {
 
             <Formik
                 initialValues={{
+                    author: post != null ? post?.author : "",
                     title: post != null ? post?.title : "",
                     body: post != null ? post?.body : "",
                 }}
                 enableReinitialize={post != null ? true : false}
                 validationSchema={yup.object().shape({
+                    author: yup.string().required(),
                     title: yup.string().required(),
                     body: yup.string().required(),
                 })}
                 onSubmit={async (values) => {
-                    if (post) {
-                        handleUpdatePost(values);
-                        message.success("Successfully updated a post");
-                    } else {
-                        handleAddPost(values);
-                        message.success("Successfully created a post");
+                    try {
+                        if (post) {
+                            await _updatePost({
+                                variables: {
+                                    id: post.id,
+                                    ...values,
+                                },
+                            });
+                            message.success("Successfully updated a post");
+                        } else {
+                            await _createPost({
+                                variables: {
+                                    ...values,
+                                },
+                            });
+                            message.success("Successfully created a post");
+                        }
+                    } catch (error) {
+                        message.error("Something went wrong! try again later.");
                     }
                     onClose();
                 }}
             >
-                {({ submitForm }) => (
+                {({ submitForm, dirty }) => (
                     <Form>
+                        <FormItem
+                            label={<h3>Author:</h3>}
+                            name={"author"}
+                            labelCol={{ span: 24 }}
+                            wrapperCol={{ span: 24 }}
+                        >
+                            <Input name="author" placeholder="Enter author name" />
+                        </FormItem>
                         <FormItem
                             label={<h3>Title:</h3>}
                             name={"title"}
@@ -90,9 +94,14 @@ const FormPost: React.FC<Props> = ({ onClose }) => {
                             labelCol={{ span: 24 }}
                             wrapperCol={{ span: 24 }}
                         >
-                            <Input.TextArea name="body" placeholder="Enter Body" />
+                            <Input.TextArea name="body" placeholder="Enter Body" rows={15} />
                         </FormItem>
-                        <Button onClick={submitForm}>Submit</Button>
+                        <Button
+                            onClick={submitForm}
+                            disabled={updateLoading || createLoading || !dirty}
+                        >
+                            Submit
+                        </Button>
                     </Form>
                 )}
             </Formik>

@@ -1,14 +1,11 @@
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import "./App.css";
-import { Layout, message, Spin } from "antd";
+import { Layout } from "antd";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import LayoutHeader from "./components/layout/header";
 import LayoutContent from "./components/layout/content";
 import ListPost from "./features/posts/components/list-post";
 import ListUsers from "./features/users/components/list-users";
-import getListUser from "./features/users/graphql/queries/get-list-users";
-import appContext from "./context/app-context";
-import getListPost from "./features/posts/graphql/queries/get-list-posts";
 
 const App: React.FC = () => {
     return (

@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Drawer, message, Modal, Space, Table } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import { Drawer, message, Modal, Space, Table, Input } from "antd";
 import { PostItem } from "../../../entities";
 import ViewPost from "./view-post";
 import appContext from "../../../context/app-context";
@@ -7,6 +7,11 @@ import FormPost from "./form-post";
 import AddButton from "../../../components/button/addButton";
 import { PlusOutlined } from "@ant-design/icons";
 import { columns } from "./constant";
+import getListPost from "../graphql/queries/get-list-posts";
+import getListPostMeta from "../graphql/queries/list-post-meta";
+import deletePost from "../graphql/mutations/delete-post";
+
+const { Search } = Input;
 
 const ListPost: React.FC = () => {
     const {
@@ -16,7 +21,48 @@ const ListPost: React.FC = () => {
     const [pagination, setPagination] = useState(1);
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderVisible, setSliderVisible] = useState(false);
+    const [search, setSearch] = useState("");
+    const [_deletePost, { loading: deleteLoading }] = deletePost();
+    const {
+        data: listPost,
+        loading: listLoading,
+        refetch: listPostRefetch,
+        error,
+    } = getListPost({
+        search: search,
+        pagination: pagination,
+    });
+    const {
+        data: listPostMeta,
+        loading: listLoadingMeta,
+        refetch: listPostMetaRefetch,
+    } = getListPostMeta({
+        search: search,
+        pagination: pagination,
+    });
 
+    useEffect(() => {
+        if (listPost != undefined) {
+            dispatch({
+                type: "STORE_POST",
+                payload: listPost.allPosts,
+            });
+        }
+        if (error != undefined) {
+            message.error("Somehthing went wrong! try again later");
+        }
+    }, [listPost, error]);
+
+    const refetchList = () => {
+        listPostRefetch();
+        listPostMetaRefetch();
+    };
+
+    const handleOnSearch = (value: string) => {
+        setPagination(1);
+        setSearch(value);
+        refetchList();
+    };
     const handlePagination = (value: number) => {
         setPagination(value);
     };
@@ -24,6 +70,7 @@ const ListPost: React.FC = () => {
     const handleCloseModal = () => {
         setSliderVisible(false);
         setModalVisible(false);
+        refetchList();
     };
 
     const handleViewPost = (value: PostItem) => {
@@ -42,41 +89,55 @@ const ListPost: React.FC = () => {
         setSliderVisible(true);
     };
 
-    const handleDeletePost = (id: string) => {
-        dispatch({
-            type: "DELETE_POST",
-            payload: id,
-        });
-        message.success("Successfully deleted a post");
+    const handleDeletePost = async (id: string) => {
+        if (!deleteLoading) {
+            try {
+                await _deletePost({
+                    variables: {
+                        id: id,
+                    },
+                });
+                message.success("Successfully deleted a post");
+                refetchList();
+            } catch (error) {
+                message.error("Somehthing went wrong! try again later");
+            }
+        }
     };
 
     return (
         <div style={{ paddingTop: 20 }}>
             <div style={{ display: "flex", marginBottom: 15 }}>
+                <Search
+                    placeholder="input search text"
+                    allowClear
+                    enterButton="Search"
+                    size="large"
+                    onSearch={handleOnSearch}
+                />
                 <AddButton icon={<PlusOutlined />} onClick={() => setSliderVisible(true)}>
                     ADD POST
                 </AddButton>
             </div>
 
             <Table
-                dataSource={posts
-                    .map((item, index) => ({
-                        key: index,
-                        title: item.title,
-                        author: item.user.username,
-                        action: (
-                            <Space size="middle">
-                                <a onClick={() => handleViewPost(item)}>view</a>
-                                <a onClick={() => handleUpdatePost(item)}>edit</a>
-                                <a onClick={() => handleDeletePost(item.id)}>delete</a>
-                            </Space>
-                        ),
-                    }))
-                    .reverse()}
+                loading={listLoading || listLoadingMeta}
+                dataSource={posts.map((item, index) => ({
+                    key: index,
+                    title: item.title,
+                    author: item.author,
+                    action: (
+                        <Space size="middle">
+                            <a onClick={() => handleViewPost(item)}>view</a>
+                            <a onClick={() => handleUpdatePost(item)}>edit</a>
+                            <a onClick={() => handleDeletePost(item.id)}>delete</a>
+                        </Space>
+                    ),
+                }))}
                 pagination={{
                     current: pagination,
-                    total: posts.length,
-                    pageSize: 9,
+                    total: listPostMeta != undefined ? listPostMeta._allPostsMeta.count : 0,
+                    pageSize: 5,
                     onChange: handlePagination,
                     hideOnSinglePage: true,
                     showSizeChanger: false,

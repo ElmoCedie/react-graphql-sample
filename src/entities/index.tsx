@@ -1,12 +1,7 @@
 import { Dispatch } from "react";
 
 export interface Posts {
-    posts: {
-        meta: {
-            totalCount: number;
-        };
-        data: PostItem[];
-    };
+    allPosts: PostItem[];
 }
 
 export interface Users {
@@ -22,11 +17,7 @@ export interface PostItem {
     id: string;
     title: string;
     body: string;
-    user: User;
-}
-
-export interface PostData {
-    post: PostItem;
+    author: string;
 }
 
 export interface User {

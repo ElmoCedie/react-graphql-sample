@@ -22,7 +22,7 @@ const ViewPost: React.FC = () => {
     return (
         <Typography>
             <Title level={4}>{post?.title}</Title>
-            <Title level={5}>{`Created By ${post?.user.username}`}</Title>
+            <Title level={5}>{`Created: ${post?.author}`}</Title>
             <Paragraph>{post?.body}</Paragraph>
         </Typography>
     );

@@ -1,14 +1,11 @@
 import { ContextAction, PostItem, User } from "../entities";
 import {
-    ADD_POST,
     ADD_USER,
-    DELETE_POST,
     DELETE_USER,
     GET_POST,
     GET_USER,
     STORE_POST,
     STORE_USER,
-    UPDATE_POST,
     UPDATE_USER,
 } from "./mainAction";
 
@@ -31,28 +28,7 @@ const mainReducer = (state: Props, action: ContextAction) => {
                 ...state,
                 post: action.payload,
             };
-        case ADD_POST:
-            return {
-                ...state,
-                posts: [...state.posts, action.payload],
-            };
-        case UPDATE_POST:
-            const updatedPostItem = action.payload;
-            const indexPost = state.posts.findIndex((item) => item.id === updatedPostItem.id);
-            const newPostList = state.posts;
-            newPostList[indexPost] = updatedPostItem;
-            return {
-                ...state,
-                posts: newPostList,
-            };
-        case DELETE_POST:
-            const filteredPosts = state.posts.filter((value) => {
-                return action.payload != value.id;
-            });
-            return {
-                ...state,
-                posts: filteredPosts,
-            };
+
         // Users
         case STORE_USER:
             return {

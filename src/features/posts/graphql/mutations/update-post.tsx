@@ -1,11 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
 
 const MUTATION = gql`
-    mutation updatePost($formData: UpdatePostInput!, $id: ID!) {
-        updatePost(input: $formData, id: $id) {
+    mutation updatePost($id: ID!, $author: String, $title: String, $body: String) {
+        updatePost(id: $id, author: $author, title: $title, body: $body) {
             id
-            title
-            body
         }
     }
 `;
