@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { Typography } from "antd";
-import appContext from "../../../contenxt/app-context";
+import appContext from "../../../context/app-context";
 
 const { Title, Paragraph } = Typography;
 

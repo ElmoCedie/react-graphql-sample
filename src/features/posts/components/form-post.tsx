@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import { FormItem, Input } from "formik-antd";
 import React, { useContext, useEffect } from "react";
 import * as yup from "yup";
-import appContext from "../../../contenxt/app-context";
+import appContext from "../../../context/app-context";
 import createPost from "../graphql/mutations/create-post";
 import updatePost from "../graphql/mutations/update-post";
 

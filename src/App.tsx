@@ -6,7 +6,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import LayoutHeader from "./components/layout/header";
 import LayoutContent from "./components/layout/content";
 import ListPost from "./features/posts/components/list-post";
-import AppState from "./contenxt/AppState";
+import AppState from "./context/AppState";
 import ListUsers from "./features/users/components/list-users";
 
 export const client = new ApolloClient({

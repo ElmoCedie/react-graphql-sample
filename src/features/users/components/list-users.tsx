@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Drawer, Input, Space, Spin, Table } from "antd";
-import appContext from "../../../contenxt/app-context";
+import appContext from "../../../context/app-context";
 import getListUser from "../graphql/queries/get-list-users";
 import { columns } from "./constant";
 import AddButton from "../../../components/button/addButton";
@@ -43,7 +43,7 @@ const ListUsers: React.FC = () => {
             }
             setSliderVisible(true);
         }
-    }, [params]);
+    }, []);
 
     useEffect(() => {
         if (_userInfo != undefined) {

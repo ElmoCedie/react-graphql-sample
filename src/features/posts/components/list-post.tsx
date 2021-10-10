@@ -5,7 +5,7 @@ import CardItem from "./card-item";
 import { useHistory, useParams } from "react-router-dom";
 import { PostItem } from "../../../entities";
 import ViewPost from "./view-post";
-import appContext from "../../../contenxt/app-context";
+import appContext from "../../../context/app-context";
 import FormPost from "./form-post";
 import deletePost from "../graphql/mutations/delete-post";
 import { lazyGetPost } from "../graphql/queries/get-post";
