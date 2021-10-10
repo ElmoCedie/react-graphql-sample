@@ -4,11 +4,7 @@ import appContext from "../../../context/app-context";
 
 const { Title, Text } = Typography;
 
-interface Props {
-    id: string;
-}
-
-const ViewUser: React.FC<Props> = () => {
+const ViewUser: React.FC = () => {
     const {
         state: { user },
         dispatch,

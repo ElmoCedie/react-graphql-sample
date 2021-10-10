@@ -12,25 +12,26 @@ const QUERY = gql`
                 name
                 username
                 email
+                phone
             }
         }
     }
 `;
 
-const getListUser = ({ search = "", pagination = 1 }): QueryResult<Users, OperationVariables> => {
+const getListUser = (): QueryResult<Users, OperationVariables> => {
     return useQuery<Users>(QUERY, {
         fetchPolicy: "no-cache",
-        variables: {
-            options: {
-                paginate: {
-                    page: pagination,
-                    limit: 5,
-                },
-                search: {
-                    q: search,
-                },
-            },
-        },
+        // variables: {
+        // options: {
+        // paginate: {
+        //     page: pagination,
+        //     limit: 5,
+        // },
+        // search: {
+        //     q: search,
+        // },
+        // },
+        // },
     });
 };
 

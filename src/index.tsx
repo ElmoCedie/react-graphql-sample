@@ -3,10 +3,21 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import AppState from "./context/AppState";
+
+export const client = new ApolloClient({
+    uri: "https://graphqlzero.almansi.me/api",
+    cache: new InMemoryCache(),
+});
 
 ReactDOM.render(
     <React.StrictMode>
-        <App />
+        <ApolloProvider client={client}>
+            <AppState>
+                <App />
+            </AppState>
+        </ApolloProvider>
     </React.StrictMode>,
     document.getElementById("root")
 );

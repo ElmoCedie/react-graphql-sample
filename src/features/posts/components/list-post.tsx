@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import getListPost from "../graphql/queries/get-list-posts";
-import { Drawer, Input, message, Modal, Pagination, Spin } from "antd";
+import { Drawer, message, Modal, Pagination, Spin } from "antd";
 import CardItem from "./card-item";
 import { useHistory, useParams } from "react-router-dom";
 import { PostItem } from "../../../entities";
@@ -11,8 +10,6 @@ import deletePost from "../graphql/mutations/delete-post";
 import { lazyGetPost } from "../graphql/queries/get-post";
 import AddButton from "../../../components/button/addButton";
 import { PlusOutlined } from "@ant-design/icons";
-
-const { Search } = Input;
 
 interface Props {
     id: string;
@@ -25,17 +22,11 @@ const ListPost: React.FC = () => {
     } = useContext(appContext);
     const params = useParams<Props>();
     const history = useHistory();
-    const [totalItem, setTotalItem] = useState(0);
     const [pagination, setPagination] = useState(1);
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderVisible, setSliderVisible] = useState(false);
-    const [search, setSearch] = useState("");
     const [_deletePost] = deletePost();
     const [getPostData, { loading: getloader, data: getData }] = lazyGetPost(params.id);
-    const { loading, data, refetch, error } = getListPost({
-        search: search,
-        pagination: pagination,
-    });
 
     useEffect(() => {
         if (params.id != undefined) {
@@ -57,33 +48,11 @@ const ListPost: React.FC = () => {
         }
     }, [getData]);
 
-    useEffect(() => {
-        if (data != undefined) {
-            // store in state management
-            dispatch({
-                type: "STORE_POST",
-                payload: data.posts.data,
-            });
-            setTotalItem(data.posts.meta.totalCount);
-        }
-        if (error != undefined) {
-            console.log(error);
-        }
-    }, [data, error]);
-
-    const handleOnSearch = (value: string) => {
-        setPagination(1);
-        setSearch(value);
-        refetch();
-    };
-
     const handlePagination = (value: number) => {
         setPagination(value);
-        refetch();
     };
 
     const handleCloseModal = () => {
-        refetch();
         history.push("/post");
         setSliderVisible(false);
         setModalVisible(false);
@@ -117,30 +86,22 @@ const ListPost: React.FC = () => {
     return (
         <div style={{ paddingTop: 50 }}>
             <div style={{ display: "flex" }}>
-                <Search
-                    placeholder="input search text"
-                    allowClear
-                    enterButton="Search"
-                    size="large"
-                    onSearch={handleOnSearch}
-                />
                 <AddButton icon={<PlusOutlined />} onClick={() => setSliderVisible(true)}>
                     ADD POST
                 </AddButton>
             </div>
 
             <div style={{ height: 500 }}>
-                {loading ? (
-                    <Spin size="large" style={{ marginTop: 15 }} />
-                ) : (
-                    <div
-                        style={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            justifyContent: "center",
-                        }}
-                    >
-                        {posts.map((item: PostItem, index: number) => (
+                <div
+                    style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                    }}
+                >
+                    {posts
+                        .slice(pagination == 1 ? 0 : (pagination - 1) * 9, pagination * 9)
+                        .map((item: PostItem, index: number) => (
                             <CardItem
                                 key={index}
                                 title={item.title}
@@ -148,15 +109,14 @@ const ListPost: React.FC = () => {
                                 onClick={(value: string) => handleCardEllipsis(value, item.id)}
                             />
                         ))}
-                    </div>
-                )}
+                </div>
             </div>
 
             <Pagination
                 current={pagination}
-                total={totalItem}
+                total={posts.length}
                 onChange={handlePagination}
-                hideOnSinglePage
+                // hideOnSinglePage
                 showSizeChanger={false}
             />
 

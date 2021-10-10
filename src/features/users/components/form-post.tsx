@@ -4,13 +4,13 @@ import { FormItem, Input } from "formik-antd";
 import React, { useContext, useEffect } from "react";
 import * as yup from "yup";
 import appContext from "../../../context/app-context";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
-    id?: string;
     onClose: () => void;
 }
 
-const FormUser: React.FC<Props> = ({ id, onClose }) => {
+const FormUser: React.FC<Props> = ({ onClose }) => {
     const {
         state: { user },
         dispatch,
@@ -25,15 +25,35 @@ const FormUser: React.FC<Props> = ({ id, onClose }) => {
         };
     }, []);
 
+    const handleAddUser = (value: any) => {
+        dispatch({
+            type: "ADD_USER",
+            payload: {
+                id: uuidv4(),
+                ...value,
+            },
+        });
+    };
+
+    const handleUpdateUser = (value: any) => {
+        dispatch({
+            type: "UPDATE_USER",
+            payload: {
+                id: user?.id,
+                ...value,
+            },
+        });
+    };
+
     return (
         <div>
-            <h1>{id != null ? "Update" : "Add"} a user </h1>
+            <h1>{user != null ? "Update" : "Add"} a user </h1>
 
             <Formik
                 initialValues={{
-                    name: id != null ? user?.name : "",
-                    username: id != null ? user?.username : "",
-                    email: id != null ? user?.email : "",
+                    name: user != null ? user?.name : "",
+                    username: user != null ? user?.username : "",
+                    email: user != null ? user?.email : "",
                 }}
                 enableReinitialize={user != null ? true : false}
                 validationSchema={yup.object().shape({
@@ -43,9 +63,11 @@ const FormUser: React.FC<Props> = ({ id, onClose }) => {
                 })}
                 onSubmit={async (values) => {
                     console.log(values);
-                    if (id) {
+                    if (user) {
+                        handleUpdateUser(values);
                         message.success("Sucessfully updated a user");
                     } else {
+                        handleAddUser(values);
                         message.success("Sucessfully added a user");
                     }
                     onClose();

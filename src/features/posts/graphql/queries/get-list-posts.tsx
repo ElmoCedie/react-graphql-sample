@@ -20,20 +20,20 @@ const QUERY = gql`
     }
 `;
 
-const getListPost = ({ search = "", pagination = 1 }): QueryResult<Posts, OperationVariables> => {
+const getListPost = (): QueryResult<Posts, OperationVariables> => {
     return useQuery<Posts>(QUERY, {
         fetchPolicy: "no-cache",
-        variables: {
-            options: {
-                paginate: {
-                    page: pagination,
-                    limit: 9,
-                },
-                search: {
-                    q: search,
-                },
-            },
-        },
+        // variables: {
+        //     options: {
+        //         paginate: {
+        //             page: pagination,
+        //             limit: 9,
+        //         },
+        //         search: {
+        //             q: search,
+        //         },
+        //     },
+        // },
     });
 };
 

@@ -1,11 +1,5 @@
 export const columns = [
     {
-        title: "ID",
-        dataIndex: "id",
-        key: "id",
-        span: 3,
-    },
-    {
         title: "Name",
         dataIndex: "name",
         key: "name",

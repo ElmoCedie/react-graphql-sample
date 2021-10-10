@@ -1,44 +1,67 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import "./App.css";
-import { Layout } from "antd";
+import { Layout, message, Spin } from "antd";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import LayoutHeader from "./components/layout/header";
 import LayoutContent from "./components/layout/content";
 import ListPost from "./features/posts/components/list-post";
-import AppState from "./context/AppState";
 import ListUsers from "./features/users/components/list-users";
-
-export const client = new ApolloClient({
-    uri: "https://graphqlzero.almansi.me/api",
-    cache: new InMemoryCache(),
-});
+import getListUser from "./features/users/graphql/queries/get-list-users";
+import appContext from "./context/app-context";
+import getListPost from "./features/posts/graphql/queries/get-list-posts";
 
 const App: React.FC = () => {
+    const { dispatch } = useContext(appContext);
+    const { loading: userLoader, data: userData, error: userError } = getListUser();
+    const { loading: postLoader, data: postData, error: postError } = getListPost();
+    useEffect(() => {
+        if (userData != undefined) {
+            dispatch({
+                type: "STORE_USER",
+                payload: userData.users.data,
+            });
+        }
+        if (userError != undefined) {
+            message.error("Something went wrong! please try again later");
+        }
+    }, [userData, postError]);
+
+    useEffect(() => {
+        if (postData != undefined) {
+            dispatch({
+                type: "STORE_POST",
+                payload: postData.posts.data,
+            });
+        }
+        if (postError != undefined) {
+            message.error("Something went wrong! please try again later");
+        }
+    }, [postData, postError]);
+
     return (
         <div className="App">
-            <ApolloProvider client={client}>
-                <Router>
-                    <AppState>
-                        <Layout>
-                            <LayoutHeader />
-                            <LayoutContent>
-                                <Switch>
-                                    <Route exact path="/">
-                                        <Redirect to="/post" />
-                                    </Route>
-                                    <Route exact path={["/user", "/user/:id", "/user/update/:id"]}>
-                                        <ListUsers />
-                                    </Route>
-                                    <Route exact path={["/post", "/post/:id", "/post/update/:id"]}>
-                                        <ListPost />
-                                    </Route>
-                                </Switch>
-                            </LayoutContent>
-                        </Layout>
-                    </AppState>
-                </Router>
-            </ApolloProvider>
+            <Router>
+                <Layout>
+                    <LayoutHeader />
+                    <LayoutContent>
+                        {userLoader || postLoader ? (
+                            <Spin size={"large"} />
+                        ) : (
+                            <Switch>
+                                <Route exact path="/">
+                                    <Redirect to="/user" />
+                                </Route>
+                                <Route exact path={["/user"]}>
+                                    <ListUsers />
+                                </Route>
+                                <Route exact path={["/post", "/post/:id", "/post/update/:id"]}>
+                                    <ListPost />
+                                </Route>
+                            </Switch>
+                        )}
+                    </LayoutContent>
+                </Layout>
+            </Router>
         </div>
     );
 };
