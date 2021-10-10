@@ -27,6 +27,7 @@ const ViewUser: React.FC = () => {
                 <Text>Name: {user?.name}</Text>
                 <Text>Username: {user?.username}</Text>
                 <Text>Email: {user?.email}</Text>
+                <Text>Phone: {user?.phone}</Text>
             </Space>
         </Typography>
     );

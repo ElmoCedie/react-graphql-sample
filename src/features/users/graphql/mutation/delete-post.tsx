@@ -1,8 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 
 const MUTATION = gql`
-    mutation deletePost($id: ID!) {
-        deletePost(id: $id)
+    mutation removeUser($id: ID!) {
+        removeUser(id: $id) {
+            id
+        }
     }
 `;
 

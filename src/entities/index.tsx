@@ -5,12 +5,7 @@ export interface Posts {
 }
 
 export interface Users {
-    users: {
-        meta: {
-            totalCount: number;
-        };
-        data: User[];
-    };
+    allUsers: User[];
 }
 
 export interface PostItem {
@@ -24,10 +19,10 @@ export interface User {
     id: string;
     name: string;
     username: string;
-    email?: string;
-    address?: string;
+    email: string;
     phone: string;
     website?: string;
+    address?: string;
     company?: Company;
 }
 

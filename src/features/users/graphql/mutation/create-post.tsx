@@ -1,11 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
 
 const MUTATION = gql`
-    mutation createPost($formData: CreatePostInput!) {
-        createPost(input: $formData) {
+    mutation createUser($name: String!, $email: String!, $username: String!, $phone: String!) {
+        createUser(name: $name, email: $email, username: $username, phone: $phone) {
             id
-            title
-            body
         }
     }
 `;

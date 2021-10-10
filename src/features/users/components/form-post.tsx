@@ -4,7 +4,8 @@ import { FormItem, Input } from "formik-antd";
 import React, { useContext, useEffect } from "react";
 import * as yup from "yup";
 import appContext from "../../../context/app-context";
-import { v4 as uuidv4 } from "uuid";
+import createUser from "../graphql/mutation/create-post";
+import updateUser from "../graphql/mutation/update-post";
 
 interface Props {
     onClose: () => void;
@@ -15,35 +16,19 @@ const FormUser: React.FC<Props> = ({ onClose }) => {
         state: { user },
         dispatch,
     } = useContext(appContext);
+    const [_createPost, { loading: createLoading }] = createUser();
+    const [_updatePost, { loading: updateLoading }] = updateUser();
 
     useEffect(() => {
         return () => {
-            dispatch({
-                type: "GET_USER",
-                payload: null,
-            });
+            if (user != null) {
+                dispatch({
+                    type: "GET_USER",
+                    payload: null,
+                });
+            }
         };
     }, []);
-
-    const handleAddUser = (value: any) => {
-        dispatch({
-            type: "ADD_USER",
-            payload: {
-                id: uuidv4(),
-                ...value,
-            },
-        });
-    };
-
-    const handleUpdateUser = (value: any) => {
-        dispatch({
-            type: "UPDATE_USER",
-            payload: {
-                id: user?.id,
-                ...value,
-            },
-        });
-    };
 
     return (
         <div>
@@ -54,22 +39,35 @@ const FormUser: React.FC<Props> = ({ onClose }) => {
                     name: user != null ? user?.name : "",
                     username: user != null ? user?.username : "",
                     email: user != null ? user?.email : "",
+                    phone: user != null ? user?.phone : "",
                 }}
                 enableReinitialize={user != null ? true : false}
                 validationSchema={yup.object().shape({
                     name: yup.string().required(),
                     username: yup.string().required(),
                     email: yup.string().required(),
+                    phone: yup.string().required(),
                 })}
                 onSubmit={async (values) => {
-                    console.log(values);
-                    if (user) {
-                        handleUpdateUser(values);
-                        message.success("Sucessfully updated a user");
-                    } else {
-                        handleAddUser(values);
-                        message.success("Sucessfully added a user");
+                    try {
+                        if (user) {
+                            _updatePost({
+                                variables: {
+                                    id: user.id,
+                                    ...values,
+                                },
+                            });
+                            message.success("Sucessfully updated a user");
+                        } else {
+                            _createPost({
+                                variables: values,
+                            });
+                            message.success("Sucessfully added a user");
+                        }
+                    } catch (error) {
+                        message.success("Something went wrong! try again later.");
                     }
+
                     onClose();
                 }}
             >
@@ -102,7 +100,16 @@ const FormUser: React.FC<Props> = ({ onClose }) => {
                             <Input name="email" placeholder="Enter email" />
                         </FormItem>
 
-                        <Button onClick={submitForm} disabled={false}>
+                        <FormItem
+                            label={<h3>Phone:</h3>}
+                            name={"phone"}
+                            labelCol={{ span: 24 }}
+                            wrapperCol={{ span: 24 }}
+                        >
+                            <Input name="phone" placeholder="Enter phone number" />
+                        </FormItem>
+
+                        <Button onClick={submitForm} disabled={createLoading || updateLoading}>
                             Submit
                         </Button>
                     </Form>
