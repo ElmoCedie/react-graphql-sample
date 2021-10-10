@@ -8,7 +8,6 @@ const AppState = (props: { children: React.ReactChild }) => {
         users: [],
         post: null,
         user: null,
-        message: "sample message",
     });
 
     return <AppContext.Provider value={{ state, dispatch }}>{props.children}</AppContext.Provider>;

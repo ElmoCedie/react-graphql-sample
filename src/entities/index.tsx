@@ -50,7 +50,6 @@ export interface ContextState {
     state: {
         posts: PostItem[];
         users: User[];
-        message: string;
         post: PostItem | null;
         user: User | null;
     };
