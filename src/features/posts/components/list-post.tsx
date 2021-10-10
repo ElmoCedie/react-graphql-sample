@@ -1,123 +1,87 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Drawer, message, Modal, Pagination, Spin } from "antd";
-import CardItem from "./card-item";
-import { useHistory, useParams } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Drawer, message, Modal, Space, Table } from "antd";
 import { PostItem } from "../../../entities";
 import ViewPost from "./view-post";
 import appContext from "../../../context/app-context";
 import FormPost from "./form-post";
-import deletePost from "../graphql/mutations/delete-post";
-import { lazyGetPost } from "../graphql/queries/get-post";
 import AddButton from "../../../components/button/addButton";
 import { PlusOutlined } from "@ant-design/icons";
-
-interface Props {
-    id: string;
-}
+import { columns } from "./constant";
 
 const ListPost: React.FC = () => {
     const {
         state: { posts },
         dispatch,
     } = useContext(appContext);
-    const params = useParams<Props>();
-    const history = useHistory();
     const [pagination, setPagination] = useState(1);
     const [modalVisible, setModalVisible] = useState(false);
     const [sliderVisible, setSliderVisible] = useState(false);
-    const [_deletePost] = deletePost();
-    const [getPostData, { loading: getloader, data: getData }] = lazyGetPost(params.id);
-
-    useEffect(() => {
-        if (params.id != undefined) {
-            getPostData();
-            if (history.location.pathname.includes("update")) {
-                setSliderVisible(true);
-            } else {
-                setModalVisible(true);
-            }
-        }
-    }, [params]);
-
-    useEffect(() => {
-        if (getData != undefined) {
-            dispatch({
-                type: "GET_POST",
-                payload: getData.post,
-            });
-        }
-    }, [getData]);
 
     const handlePagination = (value: number) => {
         setPagination(value);
     };
 
     const handleCloseModal = () => {
-        history.push("/post");
         setSliderVisible(false);
         setModalVisible(false);
     };
 
-    const handleCardEllipsis = async (value: string, id: string) => {
-        switch (value) {
-            case "view":
-                getPostData();
-                history.push(`/post/${id}`);
-                setModalVisible(true);
-                break;
-            case "edit":
-                getPostData();
-                history.push(`/post/update/${id}`);
-                setSliderVisible(true);
-                break;
-            case "delete":
-                await _deletePost({
-                    variables: {
-                        id: id,
-                    },
-                });
-                message.success("Successfully deleted a post");
-                break;
-            default:
-                break;
-        }
+    const handleViewPost = (value: PostItem) => {
+        dispatch({
+            type: "GET_POST",
+            payload: value,
+        });
+        setModalVisible(true);
+    };
+
+    const handleUpdatePost = (value: PostItem) => {
+        dispatch({
+            type: "GET_POST",
+            payload: value,
+        });
+        setSliderVisible(true);
+    };
+
+    const handleDeletePost = (id: string) => {
+        dispatch({
+            type: "DELETE_POST",
+            payload: id,
+        });
+        message.success("Successfully deleted a post");
     };
 
     return (
-        <div style={{ paddingTop: 50 }}>
-            <div style={{ display: "flex" }}>
+        <div style={{ paddingTop: 20 }}>
+            <div style={{ display: "flex", marginBottom: 15 }}>
                 <AddButton icon={<PlusOutlined />} onClick={() => setSliderVisible(true)}>
                     ADD POST
                 </AddButton>
             </div>
 
-            <div style={{ height: 500 }}>
-                <div
-                    style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
-                    }}
-                >
-                    {posts
-                        .slice(pagination == 1 ? 0 : (pagination - 1) * 9, pagination * 9)
-                        .map((item: PostItem, index: number) => (
-                            <CardItem
-                                key={index}
-                                title={item.title}
-                                body={item.body}
-                                onClick={(value: string) => handleCardEllipsis(value, item.id)}
-                            />
-                        ))}
-                </div>
-            </div>
-
-            <Pagination
-                current={pagination}
-                total={posts.length}
-                onChange={handlePagination}
-                // hideOnSinglePage
-                showSizeChanger={false}
+            <Table
+                dataSource={posts
+                    .map((item, index) => ({
+                        key: index,
+                        title: item.title,
+                        author: item.user.username,
+                        action: (
+                            <Space size="middle">
+                                <a onClick={() => handleViewPost(item)}>view</a>
+                                <a onClick={() => handleUpdatePost(item)}>edit</a>
+                                <a onClick={() => handleDeletePost(item.id)}>delete</a>
+                            </Space>
+                        ),
+                    }))
+                    .reverse()}
+                pagination={{
+                    current: pagination,
+                    total: posts.length,
+                    pageSize: 9,
+                    onChange: handlePagination,
+                    hideOnSinglePage: true,
+                    showSizeChanger: false,
+                }}
+                columns={columns}
             />
 
             <Modal
@@ -128,7 +92,7 @@ const ListPost: React.FC = () => {
                 destroyOnClose
                 onCancel={handleCloseModal}
             >
-                {getloader ? <Spin size={"large"} /> : <ViewPost id={params.id} />}
+                <ViewPost />
             </Modal>
 
             <Drawer
@@ -139,11 +103,7 @@ const ListPost: React.FC = () => {
                 onClose={handleCloseModal}
                 visible={sliderVisible}
             >
-                {getloader ? (
-                    <Spin size={"large"} />
-                ) : (
-                    <FormPost id={params.id} onClose={handleCloseModal} />
-                )}
+                <FormPost onClose={handleCloseModal} />
             </Drawer>
         </div>
     );

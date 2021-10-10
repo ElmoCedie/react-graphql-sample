@@ -4,11 +4,7 @@ import appContext from "../../../context/app-context";
 
 const { Title, Paragraph } = Typography;
 
-interface Props {
-    id: string;
-}
-
-const ViewPost: React.FC<Props> = () => {
+const ViewPost: React.FC = () => {
     const {
         state: { post },
         dispatch,

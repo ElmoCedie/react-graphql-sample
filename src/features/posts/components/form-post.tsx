@@ -4,21 +4,17 @@ import { FormItem, Input } from "formik-antd";
 import React, { useContext, useEffect } from "react";
 import * as yup from "yup";
 import appContext from "../../../context/app-context";
-import createPost from "../graphql/mutations/create-post";
-import updatePost from "../graphql/mutations/update-post";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
-    id?: string;
     onClose: () => void;
 }
 
-const FormPost: React.FC<Props> = ({ id, onClose }) => {
+const FormPost: React.FC<Props> = ({ onClose }) => {
     const {
         state: { post },
         dispatch,
     } = useContext(appContext);
-    const [_createPost, { loading }] = createPost();
-    const [_updatePost, { loading: updateLoading }] = updatePost();
 
     useEffect(() => {
         return () => {
@@ -29,14 +25,38 @@ const FormPost: React.FC<Props> = ({ id, onClose }) => {
         };
     }, []);
 
+    const handleAddPost = (value: any) => {
+        dispatch({
+            type: "ADD_POST",
+            payload: {
+                id: uuidv4(),
+                ...value,
+                user: {
+                    username: "new.user",
+                },
+            },
+        });
+    };
+
+    const handleUpdatePost = (value: any) => {
+        dispatch({
+            type: "UPDATE_POST",
+            payload: {
+                ...post,
+                ...value,
+                id: post?.id,
+            },
+        });
+    };
+
     return (
         <div>
-            <h1>{id != null ? "Update" : "Create"} a post </h1>
+            <h1>{post != null ? "Update" : "Create"} a post </h1>
 
             <Formik
                 initialValues={{
-                    title: id != null ? post?.title : "",
-                    body: id != null ? post?.body : "",
+                    title: post != null ? post?.title : "",
+                    body: post != null ? post?.body : "",
                 }}
                 enableReinitialize={post != null ? true : false}
                 validationSchema={yup.object().shape({
@@ -44,20 +64,11 @@ const FormPost: React.FC<Props> = ({ id, onClose }) => {
                     body: yup.string().required(),
                 })}
                 onSubmit={async (values) => {
-                    if (id) {
-                        await _updatePost({
-                            variables: {
-                                formData: values,
-                                id,
-                            },
-                        });
+                    if (post) {
+                        handleUpdatePost(values);
                         message.success("Successfully updated a post");
                     } else {
-                        await _createPost({
-                            variables: {
-                                formData: values,
-                            },
-                        });
+                        handleAddPost(values);
                         message.success("Successfully created a post");
                     }
                     onClose();
@@ -81,9 +92,7 @@ const FormPost: React.FC<Props> = ({ id, onClose }) => {
                         >
                             <Input.TextArea name="body" placeholder="Enter Body" />
                         </FormItem>
-                        <Button onClick={submitForm} disabled={loading || updateLoading}>
-                            Submit
-                        </Button>
+                        <Button onClick={submitForm}>Submit</Button>
                     </Form>
                 )}
             </Formik>
