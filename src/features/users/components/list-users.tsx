@@ -125,7 +125,7 @@ const ListUsers: React.FC = () => {
     };
 
     return (
-        <div style={{ paddingTop: 50 }}>
+        <div style={{ paddingTop: 20 }}>
             <div style={{ display: "flex", marginBottom: 15 }}>
                 <Search
                     placeholder="input search text"
