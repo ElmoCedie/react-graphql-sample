@@ -4,6 +4,14 @@
 
 In the project directory, you can run:
 
+### `npm server`
+
+Run this first before running test/development mode.
+Open [http://localhost:3001](http://localhost:3001) to view it in the browser.
+
+note: once the server is down all changes will be reverted to the initial data.
+note: if you're in windows please configure your ip address to localhost or set your ip address in `.env` and change `localhost` and set you ip address.
+
 ### `npm start`
 
 Runs the app in the development mode.\

@@ -7,7 +7,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import AppState from "./context/AppState";
 
 export const client = new ApolloClient({
-    uri: "https://graphqlzero.almansi.me/api",
+    uri: process.env.REACT_APP_GRAPHQL_URI,
     cache: new InMemoryCache(),
 });
 
