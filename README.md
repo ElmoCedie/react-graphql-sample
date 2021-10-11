@@ -9,9 +9,10 @@ In the project directory, you can run:
 Run this first before running test/development mode.
 Open [http://localhost:3001](http://localhost:3001) to view it in the browser.
 
-note: be sure you've install [json-graphql-server](https://www.npmjs.com/package/json-graphql-server) on your device.
-note: once the server is down all changes will be reverted to the initial data.
-note: if you're in windows please configure your ip address to localhost or set your ip address in `.env` and change `localhost` and set you ip address.
+Be sure you've install [json-graphql-server](https://www.npmjs.com/package/json-graphql-server) on your device.\
+Once the server is down all changes will be reverted to the initial data.
+
+If you're in windows please configure your ip address to recognize your localhost or set your ip address in th file `.env` and change `localhost` and set it with your ip address.
 
 ### `npm start`
 
